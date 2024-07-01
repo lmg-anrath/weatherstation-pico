@@ -14,6 +14,8 @@ class IO:
     for entry in self.os.ilistdir(path):
       isDir = entry[1] == 0x4000
       if isDir:
+        if entry[0] == self.nextDir:
+          continue
         self.rmtree(path + '/' + entry[0])
       else:
         self.os.remove(path + '/' + entry[0])
