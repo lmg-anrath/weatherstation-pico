@@ -43,7 +43,7 @@ class Main:
 			self.bmp280.press_os = lib_bmp280.BMP280_PRES_OS_4
 
 			self.bmp280.standby = lib_bmp280.BMP280_STANDBY_250
-			self.bmp280 = lib_bmp280.BMP280_IIR_FILTER_2
+			self.bmp280.iir = lib_bmp280.BMP280_IIR_FILTER_2
 			self.bmp280.spi3w = lib_bmp280.BMP280_SPI3W_ON
 
 			self.bmp280.sleep()
