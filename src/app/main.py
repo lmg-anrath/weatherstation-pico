@@ -168,8 +168,8 @@ class Main:
 			log = read_log(append='bmp280')
 			log('-- BMP280 Sensor --')
 			log('Reading data...')
-			data['temperature'] = self.bmp280.temperature()
-			data['air_pressure'] = self.bmp280.pressure()
+			data['temperature'] = self.bmp280.temperature
+			data['air_pressure'] = self.bmp280.pressure
 
 			log('Data read, sleep sensor...')
 			self.bmp280.sleep()
