@@ -1,4 +1,4 @@
-import gc
+import gc, machine, asyncio
 
 class IO:
   def __init__(self, os=None, logger=None):
@@ -116,12 +116,19 @@ class OTAUpdater:
     if localSha == remoteSha:
       return
 
+    self.log('Updating from %s to %s' % (localSha, remoteSha))
+    pin = machine.Pin('LED', machine.Pin.OUT)
+    led = asyncio.create_task(blink(pin, 0.5))
+
     self.io.rmtree(self.nextDir)
     self.io.mkdir(self.nextDir)
     self.github.download(remoteSha, self.nextDir, base=self.mainDir)
     self.io.writeFile(self.nextDir + '/' + self.versionFile, remoteSha)
     self.io.rmmain(self.mainDir, self.nextDir)
     self.io.move(self.nextDir, self.mainDir)
+
+    led.cancel()
+    pin.off()
 
 class GitHub:
   def __init__(self, requests=None, remote=None, io=None, logger=None, branch='master', username='', token='', base64=None):
@@ -158,3 +165,10 @@ class GitHub:
         self.download(sha=sha, destination=destination, currentDir=self.io.path(currentDir, file['name']), base=base)
 
     fileList.close()
+
+async def blink(led, delay):
+  while True:
+    led.on()
+    await asyncio.sleep(delay)
+    led.off()
+    await asyncio.sleep(delay)

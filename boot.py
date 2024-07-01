@@ -17,6 +17,7 @@ if not sta_if.isconnected():
 		count += 1
 		if count >= 45:
 			print('Failed to connect to network')
+			time.sleep(5)
 			machine.reset()
 			break
 		pass

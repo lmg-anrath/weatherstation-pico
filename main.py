@@ -31,6 +31,7 @@ try:
 	updater.update()
 except Exception as e:
 	log('Failed to OTA update:', e)
+	time.sleep(5)
 	machine.reset()
 	pass
 
@@ -39,5 +40,6 @@ try:
 	app.Main(env=env, requests=lib.requests, logger=logger, time=t, updater=updater)
 except Exception as e:
 	log('Failed to start main app:', e)
+	time.sleep(5)
 	machine.reset()
 	pass

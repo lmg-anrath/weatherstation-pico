@@ -1,4 +1,4 @@
-import json, machine, urequests, json, gc
+import json, machine, urequests, json, gc, asyncio
 from machine import Pin
 import src.lib.sds011 as lib_sds011, src.lib.bmp280 as lib_bmp280, dht as lib_dht22
 
@@ -14,6 +14,10 @@ class Main:
 		self.log = logger(append='weatherstation')
 		self.log('The current time is %s' % self.time.human())
 
+
+		self.led = machine.Pin('LED', machine.Pin.OUT)
+		self.led.on()
+
 		gc.enable()
 
 		# Setting up sensors and starting main loop
@@ -21,6 +25,7 @@ class Main:
 		self.start()
 
 	def setup(self):
+		blink = asyncio.create_task(blink(self.led, 1))
 		setup_log = self.log(append='setup')
 		setup_log('Setting up sensors...')
 
@@ -67,6 +72,9 @@ class Main:
 			log('Failed to setup DHT22:', e)
 			self.dht22 = None
 
+		self.time.sleep(2)
+		blink.cancel()
+		self.led.on()
 		setup_log('Sensor setup complete')
 
 	def start(self):
@@ -79,6 +87,7 @@ class Main:
 			(year, month, day, hour, minute, second, wday, yday) = self.time.localtime()
 			wait_time = ((minute // 15 + 1) * 15 - minute) * 60 - second
 			log('Waiting %s seconds...' %wait_time)
+			self.led.off()
 
 			# Wait until 30 seconds before the next 15 minute interval to wake up sensors
 			if wait_time > 30:
@@ -87,15 +96,21 @@ class Main:
 				self.time.sleep(wait_time)
 
 			log('Waking up sensors...')
+			self.led.on()
 			self.sds011.wake()
 			self.bmp280.force_measure()
 			self.time.sleep(30)
+
+			blink = asyncio.create_task(blink(self.led, 0.5))
 
 			# Reading sensor data
 			data = self.read()
 
 			# Upload data to server
 			self.upload(data)
+
+			blink.cancel()
+			self.led.on()
 
 			# Sleeping sensors
 			log('Sleeping sensors...')
@@ -188,3 +203,10 @@ class Main:
 		log('Upload completed with status code %s!' %res.status_code)
 		log('Response from server: ' + res.text)
 		res.close()
+
+async def blink(led, delay):
+	while True:
+		led.on()
+		await asyncio.sleep(delay)
+		led.off()
+		await asyncio.sleep(delay)
