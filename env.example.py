@@ -9,6 +9,7 @@ settings = {
 
   # Auto-Updating
   'githubRemote': 'https://github.com/lmg-anrath/weatherstation-pico',
+  'githubRemoteBranch': 'main',
   'githubUsername': '', # Optional: Without this, you may hit API limits
   'githubToken': '', # Optional: Without this, you may hit API limits
 

@@ -1,6 +1,9 @@
 import update, env, lib.requests, lib.logger, lib.requests, lib.timew, time, os, machine
 from lib import base64
 
+led = machine.Pin('LED', machine.Pin.OUT)
+led.off()
+
 t = lib.timew.Time(time=time)
 
 # Configure Logger
@@ -12,26 +15,26 @@ loggerOta = logger(append='OTAUpdater')
 
 io = update.IO(os=os, logger=loggerOta)
 github = update.GitHub(
-  io=io,
-  remote=env.settings['githubRemote'],
-  branch=env.settings['githubRemoteBranch'],
-  logger=loggerOta,
-  requests=lib.requests,
-  username=env.settings['githubUsername'],
-  token=env.settings['githubToken'],
-  base64=base64,
+	io=io,
+	remote=env.settings['githubRemote'],
+	branch=env.settings['githubRemoteBranch'],
+	logger=loggerOta,
+	requests=lib.requests,
+	username=env.settings['githubUsername'],
+	token=env.settings['githubToken'],
+	base64=base64,
 )
 updater = update.OTAUpdater(io=io, github=github, logger=loggerOta, machine=machine)
 
 try:
-  updater.update()
+	updater.update()
 except Exception as e:
-  log('Failed to OTA update:', e)
+    log('Failed to OTA update:', e)
 
 try:
-  import src.main as app
-  app.Main(env=env, requests=lib.requests, logger=logger, time=t, updater=updater)
+    import src.main as app
+    app.Main(env=env, requests=lib.requests, logger=logger, time=t, updater=updater)
 except Exception as e:
-  log('Failed to start main app:', e)
-  machine.reset()
-  pass
+	log('Failed to start main app:', e)
+	machine.reset()
+	pass
