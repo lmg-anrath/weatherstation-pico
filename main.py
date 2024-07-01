@@ -25,7 +25,7 @@ github = update.GitHub(
 	token=env.settings['githubToken'],
 	base64=base64,
 )
-updater = update.OTAUpdater(mainDir='/', io=io, github=github, logger=loggerOta, machine=machine)
+updater = update.OTAUpdater(mainDir='', io=io, github=github, logger=loggerOta, machine=machine)
 
 try:
 	updater.update()
