@@ -6,8 +6,20 @@ class IO:
     self.log = logger(append='io')
 
   def rmmain(self, path, nextDir):
-    self.nextDir = nextDir
-    self.rmtree(path)
+    if not self.exists(path):
+      return
+
+    self.log('Removing directory [%s]' % path)
+    for entry in self.os.ilistdir(path):
+      isDir = entry[1] == 0x4000
+      if isDir:
+        if hasattr(self, 'nextDir') and path == self.nextDir:
+          self.log('Skipping next directory [%s]' % entry[0])
+        else:
+          self.rmtree(path + '/' + entry[0])
+      else:
+        self.log('Removing file [%s]' % entry[0])
+        self.os.remove(path + '/' + entry[0])
 
   def rmtree(self, path):
     if not self.exists(path):
