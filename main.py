@@ -1,7 +1,7 @@
 import update, env, lib.requests, lib.logger, lib.requests, lib.timew, time, os, machine, gc
 from lib import base64
 
-gc.enable()
+#gc.enable()
 
 led = machine.Pin('LED', machine.Pin.OUT)
 led.off()

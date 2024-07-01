@@ -17,7 +17,7 @@ class IO:
     for entry in self.os.ilistdir(path):
       isDir = entry[1] == 0x4000
       if isDir:
-        if entry[0] == self.nextDir:
+        if self.nextDir and entry[0] == self.nextDir:
           self.log('Skipping next directory [%s]' % entry[0])
         else:
           self.rmtree(path + '/' + entry[0])
