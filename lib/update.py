@@ -14,16 +14,20 @@ class IO:
       return
 
     self.log('Removing directory [%s]' % path)
+    skip = False
     for entry in self.os.ilistdir(path):
       isDir = entry[1] == 0x4000
       if isDir:
-        if self.nextDir and entry[0] == self.nextDir:
+        if hasattr(self, 'nextDir') and path == self.nextDir:
           self.log('Skipping next directory [%s]' % entry[0])
+          skip = True
         else:
           self.rmtree(path + '/' + entry[0])
       else:
+        self.log('Removing file [%s]' % entry[0])
         self.os.remove(path + '/' + entry[0])
-    self.os.rmdir(path)
+    if not skip:
+      self.os.rmdir(path)
 
   def move(self, fromPath, toPath):
     self.log('Moving [%s] to [%s]' % (fromPath, toPath))
