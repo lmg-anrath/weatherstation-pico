@@ -9,7 +9,6 @@ t = lib.timew.Time(time=time)
 # Configure Logger
 logger = lib.logger.config(enabled=env.settings['debug'], include=env.settings['logInclude'], exclude=env.settings['logExclude'], time=t)
 log = logger(append='boot')
-log("The current time is %s" % t.human())
 
 loggerOta = logger(append='OTAUpdater')
 
@@ -24,7 +23,7 @@ github = update.GitHub(
 	token=env.settings['githubToken'],
 	base64=base64,
 )
-updater = update.OTAUpdater(io=io, github=github, logger=loggerOta, machine=machine)
+updater = update.OTAUpdater(mainDir='/', io=io, github=github, logger=loggerOta, machine=machine)
 
 try:
 	updater.update()

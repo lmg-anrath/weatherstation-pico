@@ -11,29 +11,32 @@ class Main:
 		self.updater = updater
 
 		# Setting up logger
-		self.log = logger(append='main')
-		self.log("The current time is %s" % self.time.human())
+		self.log = logger(append='weatherstation')
+		self.log('The current time is %s' % self.time.human())
 
 		# Setting up sensors and starting main loop
 		self.setup()
 		self.start()
 
 	def setup(self):
-		self.log('Setting up sensors...')
+		setup_log = self.log(append='setup')
+		setup_log('Setting up sensors...')
 
 		# Setup of SDS011 sensor (dust sensor)
+		log = setup_log(append='sds011')
 		try:
-			self.log('Setting up SDS011...')
+			log('Setting up SDS011...')
 			self.sds011 = lib_sds011.SDS011(machine.UART(1, baudrate=9600, tx=8, rx=9))
 			self.sds011.sleep()
-			self.log('SDS011 setup complete.')
+			log('SDS011 setup complete.')
 		except Exception as e:
-			self.log('Failed to setup SDS011:', e)
+			log('Failed to setup SDS011:', e)
 			self.sds011 = None
 
 		# Setup of BMP280 sensor (temperature and pressure sensor)
+		log = setup_log(append='bmp280')
 		try:
-			self.log('Setting up BMP280...')
+			log('Setting up BMP280...')
 			self.bmp280 = lib_bmp280.BMP280(machine.I2C(0, scl=21, sda=20))
 
 			self.bmp280.use_case(lib_bmp280.BMP280_CASE_WEATHER)
@@ -47,31 +50,33 @@ class Main:
 			self.bmp280.spi3w = lib_bmp280.BMP280_SPI3W_ON
 
 			self.bmp280.sleep()
-			self.log('BMP280 setup complete.')
+			log('BMP280 setup complete.')
 		except Exception as e:
-			self.log('Failed to setup BMP280:', e)
+			log('Failed to setup BMP280:', e)
 			self.bmp280 = None
 
 		# Setup of DHT22 sensor (humidity and temperature sensor)
+		log = setup_log(append='dht22')
 		try:
-			self.log('Setting up DHT22...')
+			log('Setting up DHT22...')
 			self.dht22 = lib_dht22.DHT22(Pin(15, Pin.IN, Pin.PULL_UP))
-			self.log('DHT22 setup complete.')
+			log('DHT22 setup complete.')
 		except Exception as e:
-			self.log('Failed to setup DHT22:', e)
+			log('Failed to setup DHT22:', e)
 			self.dht22 = None
 
-		self.log('Sensor setup complete')
+		setup_log('Sensor setup complete')
 
 	def start(self):
-		self.log('Starting main loop...')
+		log = self.log(append='loop')
+		log('Starting main loop...')
 		runs = 0
 
 		while True:
 			# Wait for the next 15 minute interval
 			(year, month, day, hour, minute, second, wday, yday) = self.time.localtime()
 			wait_time = ((minute // 15 + 1) * 15 - minute) * 60 - second
-			self.log('Waiting %s seconds...' %wait_time)
+			log('Waiting %s seconds...' %wait_time)
 
 			# Wait until 30 seconds before the next 15 minute interval to wake up sensors
 			if wait_time > 30:
@@ -79,7 +84,7 @@ class Main:
 			else:
 				self.time.sleep(wait_time)
 
-			self.log('Waking up sensors...')
+			log('Waking up sensors...')
 			self.sds011.wake()
 			self.bmp280.force_measure()
 			self.time.sleep(30)
@@ -91,16 +96,16 @@ class Main:
 			self.upload(data)
 
 			# Sleeping sensors
-			self.log('Sleeping sensors...')
+			log('Sleeping sensors...')
 			self.sds011.sleep()
 			self.bmp280.sleep()
 
 			runs += 1
-			self.log('Run %s complete' % runs)
+			log('Run %s complete' % runs)
 
 			# Rebooting every 6 hours
 			if runs >= 24: # 24 runs / 15 minutes = 6 hours
-				self.log('Ran 24 times, rebooting...')
+				log('Ran 24 times, rebooting...')
 				machine.reset()
 				break
 
@@ -108,61 +113,66 @@ class Main:
 			try:
 				self.updater.update()
 			except Exception as e:
-				self.log('Failed to OTA update:', e)
+				log('Failed to OTA update:', e)
 
 	def read(self):
-		self.log('Reading sensor data...')
+		read_log = self.log(append='read')
+		read_log('Reading sensor data...')
 		data = {
 			'timestamp': str(round(self.time.time())),
 		}
     
 		if self.sds011 is not None:
-			self.log('-- SDS011 Sensor --')
+			log = read_log(append='sds011')
+			log('-- SDS011 Sensor --')
 			# Returns NOK if no measurement found in reasonable time
-			self.log('Reading data...')
+			log('Reading data...')
 			status = self.sds011.read()
 			# Returns NOK if checksum failed
 			pkt_status = self.sds011.packet_status
 			# Stop fan
-			self.log('Data read, sleep sensor...')
+			log('Data read, sleep sensor...')
 			self.sds011.sleep()
 
 			if status == False:
-				self.log('Measurement failed.')
+				log('Measurement failed.')
 			elif pkt_status == False:
-				self.log('Received corrupted data.')
+				log('Received corrupted data.')
 			else:
 				data['air_particle_pm25'] = self.sds011.pm25
 				data['air_particle_pm10'] = self.sds011.pm10
-				self.log('PM2.5: %s' % data['air_particle_pm25'])
-				self.log('PM10: %s' % data['air_particle_pm10'])
+				log('PM2.5: %s' % data['air_particle_pm25'])
+				log('PM10: %s' % data['air_particle_pm10'])
 
 		if self.bmp280 is not None:
-			self.log('-- BMP280 Sensor --')
-			self.log('Reading data...')
+			log = read_log(append='bmp280')
+			log('-- BMP280 Sensor --')
+			log('Reading data...')
 			data['temperature'] = self.bmp280.temperature()
 			data['air_pressure'] = self.bmp280.pressure()
 
-			self.log('Data read, sleep sensor...')
+			log('Data read, sleep sensor...')
 			self.bmp280.sleep()
 
-			self.log('Temperature: %s C' % data['temperature'])
-			self.log('Pressure: %s hPa' % data['air_pressure'])
+			log('Temperature: %s C' % data['temperature'])
+			log('Pressure: %s hPa' % data['air_pressure'])
 
 		if self.dht22 is not None:
-			self.log('-- DHT22 Sensor --')
+			log = read_log(append='dht22')
+			log('-- DHT22 Sensor --')
 			self.dht22.measure()
 			data['humidity'] = self.dht22.humidity()
 			data['temperature'] = self.dht22.temperature()
-			self.log('Temperature: %s C' % data['temperature'])
-			self.log('Humidity: %s %%' % data['humidity'])
+			log('Temperature: %s C' % data['temperature'])
+			log('Humidity: %s %%' % data['humidity'])
 
-		self.log('Finished reading sensor data.')
+		read_log('Finished reading sensor data.')
 		return data
 
 	def upload(self, data):
-		self.log('Uploading data...')
-		self.log('Data:', data)
+		log = self.log(append='upload')
+		log('Uploading data...')
+		log('Data:', data)
 
 		headers = {
 			'Content-Type': 'application/json',
@@ -170,6 +180,6 @@ class Main:
         }
 
 		res = urequests.post(self.env.settings['serverURL'] + '/v2/stations/' + str(self.env.settings['stationId']), data = json.dumps(data), headers = headers)
-		print('Upload completed with status code %s!' %res.status_code)
-		print('Response from server: ' + res.text)
+		log('Upload completed with status code %s!' %res.status_code)
+		log('Response from server: ' + res.text)
 		res.close()
