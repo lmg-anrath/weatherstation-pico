@@ -14,7 +14,7 @@ class Main:
 		self.log = logger(append='weatherstation')
 		self.log('The current time is %s' % self.time.human())
 
-		gc.collect()
+		gc.enable()
 
 		# Setting up sensors and starting main loop
 		self.setup()

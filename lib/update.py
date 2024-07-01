@@ -13,7 +13,6 @@ class IO:
     if not self.exists(path):
       return
 
-    gc.collect()
     self.log('Removing directory [%s]' % path)
     for entry in self.os.ilistdir(path):
       isDir = entry[1] == 0x4000
@@ -26,12 +25,10 @@ class IO:
     self.os.rmdir(path)
 
   def move(self, fromPath, toPath):
-    gc.collect()
     self.log('Moving [%s] to [%s]' % (fromPath, toPath))
     self.os.rename(fromPath, toPath)
 
   def copy(self, fromPath, toPath):
-    gc.collect()
     self.log('Copying [%s] to [%s]' % (fromPath, toPath))
     if not self.exists(toPath):
       self.mkdir(toPath)
@@ -57,7 +54,6 @@ class IO:
       return False
 
   def mkdir(self, path):
-    gc.collect()
     self.log('Making directory [%s]' % path)
     self.os.mkdir(path)
 
@@ -66,7 +62,6 @@ class IO:
       return f.read()
 
   def writeFile(self, path, contents):
-    gc.collect()
     self.log('Writing file %s' % path)
     with open(path, 'w') as file:
       file.write(contents)
