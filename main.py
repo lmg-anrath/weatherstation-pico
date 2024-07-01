@@ -30,13 +30,13 @@ updater = update.OTAUpdater(mainDir='/', io=io, github=github, logger=loggerOta,
 try:
 	updater.update()
 except Exception as e:
-    log('Failed to OTA update:', e)
-    machine.reset()
-    pass
+	log('Failed to OTA update:', e)
+	machine.reset()
+	pass
 
 try:
-    import src.main as app
-    app.Main(env=env, requests=lib.requests, logger=logger, time=t, updater=updater)
+	import src.main as app
+	app.Main(env=env, requests=lib.requests, logger=logger, time=t, updater=updater)
 except Exception as e:
 	log('Failed to start main app:', e)
 	machine.reset()
