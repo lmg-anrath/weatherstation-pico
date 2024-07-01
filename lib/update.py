@@ -5,7 +5,7 @@ class IO:
     self.os = os
     self.log = logger(append='io')
 
-  def rmtree(self, path, nextDir):
+  def rmmain(self, path, nextDir):
     self.nextDir = nextDir
     self.rmtree(path)
 
@@ -124,7 +124,7 @@ class OTAUpdater:
     self.io.mkdir(self.nextDir)
     self.github.download(remoteSha, self.nextDir, base=self.mainDir)
     self.io.writeFile(self.nextDir + '/' + self.versionFile, remoteSha)
-    self.io.rmtree(self.mainDir, self.nextDir)
+    self.io.rmmain(self.mainDir, self.nextDir)
     self.io.move(self.nextDir, self.mainDir)
 
 class GitHub:
