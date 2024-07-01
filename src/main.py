@@ -1,4 +1,4 @@
-import json, machine, urequests, json
+import json, machine, urequests, json, gc
 from machine import Pin
 import src.lib.sds011 as lib_sds011, src.lib.bmp280 as lib_bmp280, dht as lib_dht22
 
@@ -13,6 +13,8 @@ class Main:
 		# Setting up logger
 		self.log = logger(append='weatherstation')
 		self.log('The current time is %s' % self.time.human())
+
+		gc.collect()
 
 		# Setting up sensors and starting main loop
 		self.setup()
@@ -99,6 +101,9 @@ class Main:
 			log('Sleeping sensors...')
 			self.sds011.sleep()
 			self.bmp280.sleep()
+
+			# Collecting garbage
+			gc.collect()
 
 			runs += 1
 			log('Run %s complete' % runs)
