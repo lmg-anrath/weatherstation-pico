@@ -1,3 +1,5 @@
+import gc
+
 class IO:
   def __init__(self, os=None, logger=None):
     self.os = os
@@ -46,6 +48,7 @@ class IO:
       return False
 
   def mkdir(self, path):
+    gc.collect()
     self.log('Making directory [%s]' % path)
     self.os.mkdir(path)
 

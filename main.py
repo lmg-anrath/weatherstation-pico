@@ -1,5 +1,7 @@
-import update, env, lib.requests, lib.logger, lib.requests, lib.timew, time, os, machine
+import update, env, lib.requests, lib.logger, lib.requests, lib.timew, time, os, machine, gc
 from lib import base64
+
+gc.collect()
 
 led = machine.Pin('LED', machine.Pin.OUT)
 led.off()
@@ -29,6 +31,8 @@ try:
 	updater.update()
 except Exception as e:
     log('Failed to OTA update:', e)
+    machine.reset()
+    pass
 
 try:
     import src.main as app
