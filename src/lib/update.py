@@ -1,45 +1,22 @@
-import gc, machine, asyncio
+import machine, asyncio
 
 class IO:
   def __init__(self, os=None, logger=None):
     self.os = os
     self.log = logger(append='io')
 
-  def rmmain(self, path, nextDir):
-    if not self.exists(path):
-      return
-
-    self.log('Removing directory [%s]' % path)
-    for entry in self.os.ilistdir(path):
-      isDir = entry[1] == 0x4000
-      if isDir:
-        if hasattr(self, 'nextDir') and path == self.nextDir:
-          self.log('Skipping next directory [%s]' % entry[0])
-        else:
-          self.rmtree(path + '/' + entry[0])
-      else:
-        self.log('Removing file [%s]' % entry[0])
-        self.os.remove(path + '/' + entry[0])
-
   def rmtree(self, path):
     if not self.exists(path):
       return
 
     self.log('Removing directory [%s]' % path)
-    skip = False
     for entry in self.os.ilistdir(path):
       isDir = entry[1] == 0x4000
       if isDir:
-        if hasattr(self, 'nextDir') and path == self.nextDir:
-          self.log('Skipping next directory [%s]' % entry[0])
-          skip = True
-        else:
-          self.rmtree(path + '/' + entry[0])
+        self.rmtree(path + '/' + entry[0])
       else:
-        self.log('Removing file [%s]' % entry[0])
         self.os.remove(path + '/' + entry[0])
-    if not skip:
-      self.os.rmdir(path)
+    self.os.rmdir(path)
 
   def move(self, fromPath, toPath):
     self.log('Moving [%s] to [%s]' % (fromPath, toPath))
@@ -132,7 +109,6 @@ class OTAUpdater:
     if localSha == remoteSha:
       return
 
-    self.log('Updating from %s to %s' % (localSha, remoteSha))
     pin = machine.Pin('LED', machine.Pin.OUT)
     led = asyncio.create_task(blink(pin, 0.5))
 
@@ -140,7 +116,7 @@ class OTAUpdater:
     self.io.mkdir(self.nextDir)
     self.github.download(remoteSha, self.nextDir, base=self.mainDir)
     self.io.writeFile(self.nextDir + '/' + self.versionFile, remoteSha)
-    self.io.rmmain(self.mainDir, self.nextDir)
+    self.io.rmtree(self.mainDir)
     self.io.move(self.nextDir, self.mainDir)
 
     led.cancel()
