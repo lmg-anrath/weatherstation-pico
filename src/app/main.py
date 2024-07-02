@@ -79,32 +79,35 @@ class Main:
 
 	def start(self):
 		log = self.log(append='loop')
+		log('Starting main loop...')
 		loop = self.env.settings['onlyRunOnce'] != 'True'
 		runs = 0
 
-		if loop:
-			log('Running once...')
-		else:
-			log('Starting main loop...')
+		if not loop:
+			log('[WARN] The program will only run once due to onlyRunOnce being set to True.')
 
 		while True:
-			# Wait for the next 15 minute interval
-			(year, month, day, hour, minute, second, wday, yday) = self.time.localtime()
-			wait_time = ((minute // 15 + 1) * 15 - minute) * 60 - second
-			log('Waiting %s seconds...' %wait_time)
-			self.led.off()
+			if loop:
+				# Wait for the next 15 minute interval
+				(year, month, day, hour, minute, second, wday, yday) = self.time.localtime()
+				wait_time = ((minute // 15 + 1) * 15 - minute) * 60 - second
+				log('Waiting %s seconds...' %wait_time)
+				self.led.off()
 
-			# Wait until 30 seconds before the next 15 minute interval to wake up sensors
-			if wait_time > 30:
-				self.time.sleep(wait_time - 30)
-			else:
-				self.time.sleep(wait_time)
+				# Wait until 30 seconds before the next 15 minute interval to wake up sensors
+				if wait_time > 30:
+					self.time.sleep(wait_time - 30)
+				else:
+					self.time.sleep(wait_time)
 
 			log('Waking up sensors...')
 			self.led.on()
 			self.sds011.wake()
 			self.bmp280.force_measure()
-			self.time.sleep(30)
+			if loop:
+				self.time.sleep(30)
+			else:
+				self.time.sleep(3)
 
 			#blink = asyncio.create_task(blink(self.led, 0.5))
 
@@ -135,10 +138,12 @@ class Main:
 				break
 
 			# Checking for updates
-			self.updater.checkForUpdate()
+			if self.updater is not None:
+				self.updater.checkForUpdate()
 
 			# Break loop if onlyRunOnce is set to True
 			if not loop:
+				log('Exiting...')
 				break
 
 	def read(self):
