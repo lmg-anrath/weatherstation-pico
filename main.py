@@ -4,7 +4,7 @@ except Exception as e:
 	print('Failed to run src/main.py: ', e)
 	print('[Emergency] Falling back to emergency updater...')
 	try:
-		import src.emergency
+		import emergency
 	except Exception as e:
 		print('Failed to run src/emergency.py: ', e)
 		print('[Emergency] Failed to run emergency updater. Rebooting...')
