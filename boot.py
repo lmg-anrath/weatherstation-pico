@@ -18,7 +18,7 @@ except Exception as e:
 			count += 1
 			if count >= 45:
 				print('[Emergency Boot] Failed to connect to network')
-				time.sleep(5)
+				time.sleep(30)
 				machine.reset()
 				break
 			pass

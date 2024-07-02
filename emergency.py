@@ -434,8 +434,10 @@ updater = OTAUpdater(io=io, github=github, logger=loggerOta, machine=machine)
 
 try:
 	updater.update()
+	time.sleep(30)
+	machine.reset()
 except Exception as e:
 	log('Failed to OTA update:', e)
-	time.sleep(5)
+	time.sleep(30)
 	machine.reset()
 	pass
