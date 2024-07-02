@@ -129,11 +129,8 @@ class Main:
 				machine.reset()
 				break
 
-			# Updating firmware
-			try:
-				self.updater.update()
-			except Exception as e:
-				log('Failed to OTA update:', e)
+			# Checking for updates
+			self.updater.checkForUpdate()
 
 	def read(self):
 		read_log = self.log(append='read')

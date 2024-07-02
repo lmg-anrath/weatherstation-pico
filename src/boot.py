@@ -1,4 +1,4 @@
-import network, ntptime, machine, src.env as env, time
+import network, ntptime, machine, env, time
 
 led = machine.Pin('LED', machine.Pin.OUT)
 led.on()

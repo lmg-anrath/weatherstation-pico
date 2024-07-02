@@ -1,4 +1,4 @@
-import src.lib.update as update, src.env as env, src.lib.requests as requests, src.lib.logger as logger, src.lib.timew as timew, time, os, machine
+import src.lib.update as update, env, src.lib.requests as requests, src.lib.logger as logger, src.lib.timew as timew, time, os, machine
 from src.lib import base64
 
 #gc.enable()
