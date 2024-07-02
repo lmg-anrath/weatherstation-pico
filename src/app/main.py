@@ -25,7 +25,7 @@ class Main:
 		self.start()
 
 	def setup(self):
-		blink = asyncio.create_task(blink(self.led, 1))
+		#blink = asyncio.create_task(blink(self.led, 1))
 		setup_log = self.log(append='setup')
 		setup_log('Setting up sensors...')
 
@@ -73,7 +73,7 @@ class Main:
 			self.dht22 = None
 
 		self.time.sleep(2)
-		blink.cancel()
+		#blink.cancel()
 		self.led.on()
 		setup_log('Sensor setup complete')
 
@@ -101,7 +101,7 @@ class Main:
 			self.bmp280.force_measure()
 			self.time.sleep(30)
 
-			blink = asyncio.create_task(blink(self.led, 0.5))
+			#blink = asyncio.create_task(blink(self.led, 0.5))
 
 			# Reading sensor data
 			data = self.read()
@@ -109,7 +109,7 @@ class Main:
 			# Upload data to server
 			self.upload(data)
 
-			blink.cancel()
+			#blink.cancel()
 			self.led.on()
 
 			# Sleeping sensors
