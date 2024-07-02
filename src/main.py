@@ -36,7 +36,7 @@ except Exception as e:
 	pass
 
 try:
-	import src.main as app
+	import src.app.main as app
 	app.Main(env=env, requests=requests, logger=logger, time=t, updater=updater)
 except Exception as e:
 	log('Failed to start main app:', e)
