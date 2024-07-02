@@ -6,6 +6,7 @@ settings = {
   'logExclude': [], # regex supported
   'httpTimeout': 2, # seconds
   'debug': 'True',
+  'onlyRunOnce': 'False',
 
   # Auto-Updating
   'githubRemote': 'https://github.com/lmg-anrath/weatherstation-pico',

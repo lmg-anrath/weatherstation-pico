@@ -79,8 +79,13 @@ class Main:
 
 	def start(self):
 		log = self.log(append='loop')
-		log('Starting main loop...')
+		loop = self.env.settings['onlyRunOnce'] != 'True'
 		runs = 0
+
+		if loop:
+			log('Running once...')
+		else:
+			log('Starting main loop...')
 
 		while True:
 			# Wait for the next 15 minute interval
@@ -131,6 +136,10 @@ class Main:
 
 			# Checking for updates
 			self.updater.checkForUpdate()
+
+			# Break loop if onlyRunOnce is set to True
+			if not loop:
+				break
 
 	def read(self):
 		read_log = self.log(append='read')
