@@ -143,6 +143,7 @@ class Main:
 
 			# Break loop if onlyRunOnce is set to True
 			if not loop:
+				self.led.off()
 				log('Exiting...')
 				break
 
@@ -180,7 +181,7 @@ class Main:
 			log('-- BMP280 Sensor --')
 			log('Reading data...')
 			data['temperature'] = self.bmp280.temperature
-			data['air_pressure'] = self.bmp280.pressure
+			data['air_pressure'] = self.bmp280.pressure / 100
 
 			log('Data read, sleep sensor...')
 			self.bmp280.sleep()
