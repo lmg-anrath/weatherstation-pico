@@ -102,8 +102,15 @@ class Main:
 
 			log('Waking up sensors...')
 			self.led.on()
-			self.sds011.wake()
-			self.bmp280.force_measure()
+			try:
+				self.sds011.wake()
+			except Exception as e:
+				log('Failed to wake up SDS011: ', e)
+			try:
+				self.bmp280.force_measure()
+			except Exception as e:
+				log('Failed to wake up BMP280: ', e)
+
 			if loop:
 				self.time.sleep(30)
 			else:
@@ -122,8 +129,14 @@ class Main:
 
 			# Sleeping sensors
 			log('Sleeping sensors...')
-			self.sds011.sleep()
-			self.bmp280.sleep()
+			try:
+				self.sds011.sleep()
+			except Exception as e:
+				log('Failed to sleep SDS011: ', e)
+			try:
+				self.bmp280.sleep()
+			except Exception as e:
+				log('Failed to sleep BMP280: ', e)
 
 			# Collecting garbage
 			gc.collect()
