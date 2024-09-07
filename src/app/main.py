@@ -206,10 +206,13 @@ class Main:
 			log = read_log(append='dht22')
 			log('-- DHT22 Sensor --')
 			self.dht22.measure()
-			data['humidity'] = self.dht22.humidity()
-			data['temperature'] = self.dht22.temperature()
-			log('Temperature: %s C' % data['temperature'])
-			log('Humidity: %s %%' % data['humidity'])
+			try:
+				data['humidity'] = self.dht22.humidity()
+				data['temperature'] = self.dht22.temperature()
+				log('Temperature: %s C' % data['temperature'])
+				log('Humidity: %s %%' % data['humidity'])
+			except Exception as e:
+				log('Measurement failed.', e)
 
 		read_log('Finished reading sensor data.')
 		return data
