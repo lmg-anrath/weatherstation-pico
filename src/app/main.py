@@ -72,7 +72,7 @@ class Main:
 			log('Failed to setup DHT22:', e)
 			self.dht22 = None
 
-		self.time.sleep(2)
+		self.time.sleep(5)
 		#blink.cancel()
 		self.led.on()
 		setup_log('Sensor setup complete')
@@ -114,7 +114,7 @@ class Main:
 			if loop:
 				self.time.sleep(30)
 			else:
-				self.time.sleep(3)
+				self.time.sleep(10)
 
 			#blink = asyncio.create_task(blink(self.led, 0.5))
 
