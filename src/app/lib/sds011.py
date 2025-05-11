@@ -19,6 +19,7 @@ Reading format. See http://cl.ly/ekot
 
 import ustruct as struct
 import sys
+import time
 
 _SDS011_CMDS = {'SET': b'\x01',
         'GET': b'\x00',
@@ -113,6 +114,7 @@ class SDS011:
         """
         #Query measurement
         self.query()
+        time.sleep(0.5)
 
         #Read measurement
         #Drops up to 512 characters before giving up finding a measurement pkt...
